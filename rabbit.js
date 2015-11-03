@@ -3,7 +3,7 @@ var getExchange = require('./exchange');
 var Rx = require('rx');
 
 var config = require('./rabbit.json');
-
+exports.config = config;
 exports.connect = function() {
 	var exchangeStream = new Rx.Subject();
 

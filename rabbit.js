@@ -1,16 +1,25 @@
 var rabbit = require('amqp');
-var q = require('q');
+var getExchange = require('./exchange');
+var Rx = require('rx');
 
 var config = require('./rabbit.json');
 
 exports.connect = function() {
-	var deferred = q.defer();
+	var exchangeStream = new Rx.Subject();
 
 	var connection = rabbit.createConnection({ host: config.host, login: config.login, password: config.password });
-	connection.on('ready', function() {
+	var connected = Rx.Observable.fromEvent(connection, 'ready');
+	connected.subscribe(function() {
 		console.log('- connected to rabbit -');
-		deferred.resolve(connection);
+
+		getExchange(connection).subscribe(function(exchange) {
+			exchangeStream.onNext(exchange);
+		}, function() {
+			console.error('- failed to configure exchange -');
+		});
+	}, function() {
+		console.error('- failed to connect to rabbit -');
 	});
 
-	return deferred.promise;
+	return exchangeStream;
 };

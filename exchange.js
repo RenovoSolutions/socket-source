@@ -1,17 +1,17 @@
-var q = require('q');
+var Rx = require('rx');
 
 var config = require('./rabbit.json');
 
 module.exports = function(connection) {
-	var deferred = q.defer();
+	var exchangeStream = new Rx.Subject();
 
 	connection.exchange(config.exchange, {
 		type: 'fanout',
 		durable: true,
 	}, function(exchange) {
 		console.log('- exchange created -');
-		deferred.resolve(exchange);
+		exchangeStream.onNext(exchange);
 	});
 
-	return deferred.promise;
+	return exchangeStream;
 }

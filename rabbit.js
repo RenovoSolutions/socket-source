@@ -15,10 +15,10 @@ exports.connect = function() {
 		getExchange(connection).subscribe(function(exchange) {
 			exchangeStream.onNext(exchange);
 		}, function() {
-			console.error('- failed to configure exchange -');
+			exchangeStream.onError('- failed to configure exchange -');
 		});
 	}, function() {
-		console.error('- failed to connect to rabbit -');
+		exchangeStream.onError('- failed to connect to rabbit -');
 	});
 
 	return exchangeStream;

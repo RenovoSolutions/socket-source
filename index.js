@@ -24,4 +24,8 @@ exchangeStream.subscribe(function(exchange) {
 		},
 	});
 	process.exit();
+}, function(error) {
+	console.error(error);
+	logger.error(error);
+	process.exit();
 });

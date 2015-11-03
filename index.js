@@ -7,7 +7,7 @@ logger.configure({
 	host: rabbitConfig.host,
 	login: rabbitConfig.login,
 	password: rabbitConfig.password,
-	exchange: 'LOG',
+	exchange: 'log',
 });
 
 var message = messageParser.load();
@@ -17,7 +17,11 @@ var defaultRoute = '';
 var exchangeStream = rabbit.connect();
 exchangeStream.subscribe(function(exchange) {
 	console.log('- publishing message -');
-	logger.info(message);
+	logger.info({
+		area: 'sockets',
+		topic: 'populate source queue',
+		message: message,
+	});
 	exchange.publish(defaultRoute, message.body, {
 		headers: {
 			channel: message.channel,
@@ -26,6 +30,10 @@ exchangeStream.subscribe(function(exchange) {
 	process.exit();
 }, function(error) {
 	console.error(error);
-	logger.error(error);
+	logger.error({
+		area: 'sockets',
+		topic: 'populate socket queue',
+		error: error,
+	});
 	process.exit();
 });
